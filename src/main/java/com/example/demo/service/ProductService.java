@@ -50,4 +50,23 @@ public class ProductService {
         Product saved = repo.save(entity);
         return mapper.toDto(saved);
     }
+
+    @Transactional
+    public ProductDTO setActive(Long id, boolean active) {
+        Product entity = repo.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
+        entity.setActive(active);
+        Product saved = repo.save(entity);
+        return mapper.toDto(saved);
+    }
+
+    @Transactional
+    public ProductDTO activateProduct(Long id) {
+        return setActive(id, true);
+    }
+
+    @Transactional
+    public ProductDTO deactivateProduct(Long id) {
+        return setActive(id, false);
+    }
 }

@@ -35,4 +35,18 @@ public class ProductController {
         ApiResponse<ProductDTO> body = new ApiResponse<>("Product updated successfully", updated);
         return ResponseEntity.ok(body);
     }
+
+    @PatchMapping("/{id}/activate")
+    public ResponseEntity<ApiResponse<ProductDTO>> activateProduct(@PathVariable Long id) {
+        ProductDTO updated = service.activateProduct(id);
+        ApiResponse<ProductDTO> body = new ApiResponse<>("Product activated successfully", updated);
+        return ResponseEntity.ok(body);
+    }
+
+    @PatchMapping("/{id}/deactivate")
+    public ResponseEntity<ApiResponse<ProductDTO>> deactivateProduct(@PathVariable Long id) {
+        ProductDTO updated = service.deactivateProduct(id);
+        ApiResponse<ProductDTO> body = new ApiResponse<>("Product deactivated successfully", updated);
+        return ResponseEntity.ok(body);
+    }
 }
