@@ -32,4 +32,41 @@ public class ProductService {
         Product saved = repo.save(entity);
         return mapper.toDto(saved);
     }
+
+    @Transactional
+    public ProductDTO updateProduct(Long id, ProductDTO dto) {
+        Product entity = repo.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
+
+        if (dto.getSku() != null && !dto.getSku().isBlank()) {
+            repo.findBySku(dto.getSku()).ifPresent(existing -> {
+                if (!existing.getId().equals(id)) {
+                    throw new ResponseStatusException(HttpStatus.CONFLICT, "SKU already exists");
+                }
+            });
+        }
+
+        mapper.updateEntityFromDto(dto, entity);
+        Product saved = repo.save(entity);
+        return mapper.toDto(saved);
+    }
+
+    @Transactional
+    public ProductDTO setActive(Long id, boolean active) {
+        Product entity = repo.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
+        entity.setActive(active);
+        Product saved = repo.save(entity);
+        return mapper.toDto(saved);
+    }
+
+    @Transactional
+    public ProductDTO activateProduct(Long id) {
+        return setActive(id, true);
+    }
+
+    @Transactional
+    public ProductDTO deactivateProduct(Long id) {
+        return setActive(id, false);
+    }
 }
