@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.ApiResponse;
 import com.example.demo.dto.ProductDTO;
 import com.example.demo.service.ProductService;
 import jakarta.validation.Valid;
@@ -20,10 +21,18 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<ProductDTO> createProduct(@Valid @RequestBody ProductDTO dto) {
+    public ResponseEntity<ApiResponse<ProductDTO>> createProduct(@Valid @RequestBody ProductDTO dto) {
         ProductDTO created = service.createProduct(dto);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(created.getId()).toUri();
-        return ResponseEntity.created(location).body(created);
+        ApiResponse<ProductDTO> body = new ApiResponse<>("Product created successfully", created);
+        return ResponseEntity.created(location).body(body);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<ProductDTO>> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductDTO dto) {
+        ProductDTO updated = service.updateProduct(id, dto);
+        ApiResponse<ProductDTO> body = new ApiResponse<>("Product updated successfully", updated);
+        return ResponseEntity.ok(body);
     }
 }
