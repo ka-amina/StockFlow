@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 @Service
 public class ProductService {
 
@@ -18,6 +20,13 @@ public class ProductService {
     public ProductService(ProductRepository repo, ProductMapper mapper) {
         this.repo = repo;
         this.mapper = mapper;
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProductDTO> getProducts() {
+        return repo.findAll().stream()
+                .map(mapper::toDto)
+                .toList();
     }
 
     @Transactional

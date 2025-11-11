@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/products")
@@ -18,6 +19,13 @@ public class ProductController {
 
     public ProductController(ProductService service) {
         this.service = service;
+    }
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<ProductDTO>>> getProducts() {
+        List<ProductDTO> products = service.getProducts();
+        ApiResponse<List<ProductDTO>> body = new ApiResponse<>("Products retrieved successfully", products);
+        return ResponseEntity.ok(body);
     }
 
     @PostMapping
