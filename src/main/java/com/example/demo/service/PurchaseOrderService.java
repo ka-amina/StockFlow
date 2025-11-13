@@ -52,6 +52,7 @@ public class PurchaseOrderService {
             PurchaseOrderItem item = new PurchaseOrderItem();
             item.setProduct(product);
             item.setQuantityOrdered(itemDto.getQuantityOrdered());
+            item.setPrice(itemDto.getPrice());
             item.setPurchaseOrder(po);
             return item;
         }).toList();
