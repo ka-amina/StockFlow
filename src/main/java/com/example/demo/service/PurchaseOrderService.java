@@ -112,6 +112,21 @@ public class PurchaseOrderService {
         poRepo.save(po);
     }
 
+    @Transactional
+    public PurchaseOrderDTO cancelPurchaseOrder(Long id) {
+        PurchaseOrder po = poRepo.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Purchase order not found"));
+
+        if (po.getStatus() == PurchaseOrder.PurchaseOrderStatus.FULLY_RECEIVED ||
+            po.getStatus() == PurchaseOrder.PurchaseOrderStatus.PARTIALLY_RECEIVED) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot cancel a purchase order that has been partially or fully received.");
+        }
+
+        po.setStatus(PurchaseOrder.PurchaseOrderStatus.CANCELLED);
+        PurchaseOrder saved = poRepo.save(po);
+        return mapper.toDto(saved);
+    }
+
     @Transactional(readOnly = true)
     public PurchaseOrderDTO getPurchaseOrderById(Long id) {
         return poRepo.findById(id)
