@@ -39,4 +39,11 @@ public class PurchaseOrderController {
         ApiResponse<PurchaseOrderDTO> body = new ApiResponse<>("Purchase order received successfully", updated);
         return ResponseEntity.ok(body);
     }
+
+    @PutMapping("/{id}/cancel")
+    public ResponseEntity<ApiResponse<PurchaseOrderDTO>> cancelPurchaseOrder(@PathVariable Long id) {
+        PurchaseOrderDTO cancelled = service.cancelPurchaseOrder(id);
+        ApiResponse<PurchaseOrderDTO> body = new ApiResponse<>("Purchase order cancelled successfully", cancelled);
+        return ResponseEntity.ok(body);
+    }
 }
