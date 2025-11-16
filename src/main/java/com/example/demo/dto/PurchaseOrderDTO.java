@@ -1,6 +1,6 @@
 package com.example.demo.dto;
 
-import com.example.demo.model.PurchaseOrder;
+import com.example.demo.enums.PurchaseOrderStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,7 +17,7 @@ public class PurchaseOrderDTO {
     private String poNumber;
     private Long supplierId;
     private String supplierName;
-    private PurchaseOrder.PurchaseOrderStatus status;
+    private PurchaseOrderStatus status;
     private LocalDate issuedDate;
     private LocalDate expectedDeliveryDate;
     private List<PurchaseOrderItemDTO> items;

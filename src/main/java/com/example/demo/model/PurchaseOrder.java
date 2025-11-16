@@ -1,5 +1,6 @@
 package com.example.demo.model;
 
+import com.example.demo.enums.PurchaseOrderStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -38,11 +39,4 @@ public class PurchaseOrder {
 
     @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PurchaseOrderItem> items = new ArrayList<>();
-
-    public enum PurchaseOrderStatus {
-        ISSUED,
-        PARTIALLY_RECEIVED,
-        FULLY_RECEIVED,
-        CANCELLED
-    }
 }
