@@ -3,6 +3,7 @@ package com.example.demo.service;
 import com.example.demo.dto.CreatePurchaseOrderDTO;
 import com.example.demo.dto.PurchaseOrderDTO;
 import com.example.demo.dto.ReceivePurchaseOrderDTO;
+import com.example.demo.enums.PurchaseOrderStatus;
 import com.example.demo.mapper.PurchaseOrderMapper;
 import com.example.demo.model.*;
 import com.example.demo.repository.*;
@@ -43,7 +44,7 @@ public class PurchaseOrderService {
         po.setSupplier(supplier);
         po.setIssuedDate(LocalDate.now());
         po.setExpectedDeliveryDate(dto.getExpectedDeliveryDate());
-        po.setStatus(PurchaseOrder.PurchaseOrderStatus.ISSUED);
+        po.setStatus(PurchaseOrderStatus.CREATED);
         po.setPoNumber(generatePoNumber());
 
         List<PurchaseOrderItem> items = dto.getItems().stream().map(itemDto -> {
@@ -103,11 +104,11 @@ public class PurchaseOrderService {
         }
 
         if (totalReceived == 0) {
-            po.setStatus(PurchaseOrder.PurchaseOrderStatus.ISSUED);
+            po.setStatus(PurchaseOrderStatus.CREATED);
         } else if (totalReceived < totalOrdered) {
-            po.setStatus(PurchaseOrder.PurchaseOrderStatus.PARTIALLY_RECEIVED);
+            po.setStatus(PurchaseOrderStatus.APPROVED);
         } else {
-            po.setStatus(PurchaseOrder.PurchaseOrderStatus.FULLY_RECEIVED);
+            po.setStatus(PurchaseOrderStatus.RECEIVED);
         }
         poRepo.save(po);
     }
@@ -117,12 +118,12 @@ public class PurchaseOrderService {
         PurchaseOrder po = poRepo.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Purchase order not found"));
 
-        if (po.getStatus() == PurchaseOrder.PurchaseOrderStatus.FULLY_RECEIVED ||
-            po.getStatus() == PurchaseOrder.PurchaseOrderStatus.PARTIALLY_RECEIVED) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot cancel a purchase order that has been partially or fully received.");
+        if (po.getStatus() == PurchaseOrderStatus.RECEIVED ||
+                po.getStatus() == PurchaseOrderStatus.APPROVED) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot cancel a purchase order that has been approved or received.");
         }
 
-        po.setStatus(PurchaseOrder.PurchaseOrderStatus.CANCELLED);
+        po.setStatus(PurchaseOrderStatus.CANCELED);
         PurchaseOrder saved = poRepo.save(po);
         return mapper.toDto(saved);
     }
