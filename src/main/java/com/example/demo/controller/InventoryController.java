@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.dto.ApiResponse;
 import com.example.demo.dto.InventoryDTO;
 import com.example.demo.dto.InventoryMovementDTO;
+import com.example.demo.dto.RecordAdjustmentDTO;
 import com.example.demo.dto.RecordInboundDTO;
 import com.example.demo.service.InventoryService;
 import jakarta.validation.Valid;
@@ -22,6 +23,9 @@ public class InventoryController {
         this.inventoryService = inventoryService;
     }
 
+
+    // SF-11: Record INBOUND stock entry
+
     @PostMapping("/inbound")
     public ResponseEntity<ApiResponse<InventoryMovementDTO>> recordInbound(@Valid @RequestBody RecordInboundDTO dto) {
         InventoryMovementDTO movement = inventoryService.recordInbound(dto);
@@ -29,8 +33,15 @@ public class InventoryController {
                 .body(ApiResponse.success(movement, "Stock entry recorded successfully"));
     }
 
-    // Get all inventory records
+    // SF-12: Record ADJUSTMENT (inventory correction)
+    @PostMapping("/adjustment")
+    public ResponseEntity<ApiResponse<InventoryMovementDTO>> recordAdjustment(@Valid @RequestBody RecordAdjustmentDTO dto) {
+        InventoryMovementDTO movement = inventoryService.recordAdjustment(dto);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success(movement, "Inventory adjustment recorded successfully"));
+    }
 
+    // Get all inventory records
     @GetMapping
     public ResponseEntity<ApiResponse<List<InventoryDTO>>> getAllInventory() {
         List<InventoryDTO> inventory = inventoryService.getAllInventory();
