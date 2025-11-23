@@ -1,8 +1,13 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.ClientDTO;
+import com.example.demo.dto.ClientAccountDTO;
+import com.example.demo.dto.RegisterClientDTO;
+import com.example.demo.enums.Role;
 import com.example.demo.model.Client;
+import com.example.demo.model.User;
 import com.example.demo.repository.ClientRepository;
+import com.example.demo.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,20 +20,78 @@ import java.util.stream.Collectors;
 public class ClientService {
 
     private final ClientRepository clientRepo;
+    private final UserRepository userRepo;
 
-    public ClientService(ClientRepository clientRepo) {
+    public ClientService(ClientRepository clientRepo, UserRepository userRepo) {
         this.clientRepo = clientRepo;
+        this.userRepo = userRepo;
     }
 
     @Transactional
-    public ClientDTO createClient(ClientDTO dto) {
-        // Check if email already exists
+    public ClientAccountDTO registerClient(RegisterClientDTO dto) {
+        // Check if email already exists in User table
+        if (userRepo.existsByEmail(dto.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "An account with email " + dto.getEmail() + " already exists");
+        }
+
+        // Check if email already exists in Client table
         if (clientRepo.existsByEmail(dto.getEmail())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "Client with email " + dto.getEmail() + " already exists");
         }
 
+        // Create User account with CLIENT role
+        User user = User.builder()
+                .email(dto.getEmail())
+                .passwordHash(dto.getPassword())
+                .role(Role.CLIENT)
+                .active(true)
+                .build();
+
+        User savedUser = userRepo.save(user);
+
+        // Create Client profile linked to User
         Client client = Client.builder()
+                .user(savedUser)
+                .name(dto.getName())
+                .email(dto.getEmail())
+                .phone(dto.getPhone())
+                .address(dto.getAddress())
+                .active(true)
+                .build();
+
+        Client savedClient = clientRepo.save(client);
+        return toAccountDto(savedClient);
+    }
+
+    @Transactional
+    public ClientDTO createClient(ClientDTO dto) {
+        // Check if email already exists in User table
+        if (userRepo.existsByEmail(dto.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "An account with email " + dto.getEmail() + " already exists");
+        }
+
+        // Check if email already exists in Client table
+        if (clientRepo.existsByEmail(dto.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Client with email " + dto.getEmail() + " already exists");
+        }
+
+        // Create User account with CLIENT role
+        User user = User.builder()
+                .email(dto.getEmail())
+                .passwordHash(dto.getPassword()) 
+                .role(Role.CLIENT)
+                .active(true)
+                .build();
+
+        User savedUser = userRepo.save(user);
+
+        // Create Client profile linked to User
+        Client client = Client.builder()
+                .user(savedUser)
                 .name(dto.getName())
                 .email(dto.getEmail())
                 .phone(dto.getPhone())
@@ -96,5 +159,25 @@ public class ClientService {
                 .active(client.isActive())
                 .createdAt(client.getCreatedAt())
                 .build();
+    }
+
+    private ClientAccountDTO toAccountDto(Client client) {
+        ClientAccountDTO dto = ClientAccountDTO.builder()
+                .id(client.getId())
+                .name(client.getName())
+                .email(client.getEmail())
+                .phone(client.getPhone())
+                .address(client.getAddress())
+                .active(client.isActive())
+                .createdAt(client.getCreatedAt())
+                .build();
+
+        if (client.getUser() != null) {
+            dto.setUserId(client.getUser().getId());
+            dto.setUserEmail(client.getUser().getEmail());
+            dto.setUserRole(client.getUser().getRole().name());
+        }
+
+        return dto;
     }
 }

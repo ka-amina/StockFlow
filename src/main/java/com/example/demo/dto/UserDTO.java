@@ -1,20 +1,21 @@
 package com.example.demo.dto;
 
+import com.example.demo.enums.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.*;
-
-import java.time.LocalDateTime;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ClientDTO {
-    private Long id;
+public class UserDTO {
     
-    @NotBlank(message = "Client name is required")
-    private String name;
+    private Long id;
     
     @NotBlank(message = "Email is required")
     @Email(message = "Email must be valid")
@@ -23,8 +24,8 @@ public class ClientDTO {
     @NotBlank(message = "Password is required")
     private String password;
     
-    private String phone;
-    private String address;
-    private boolean active;
-    private LocalDateTime createdAt;
+    @NotNull(message = "Role is required")
+    private Role role;
+    
+    private Boolean active;
 }
