@@ -17,9 +17,11 @@ import java.util.List;
 public class SalesOrderController {
 
     private final SalesOrderService salesOrderService;
+    private final com.example.demo.service.ShipmentService shipmentService;
 
-    public SalesOrderController(SalesOrderService salesOrderService) {
+    public SalesOrderController(SalesOrderService salesOrderService, com.example.demo.service.ShipmentService shipmentService) {
         this.salesOrderService = salesOrderService;
+        this.shipmentService = shipmentService;
     }
 
     @PostMapping
@@ -68,5 +70,23 @@ public class SalesOrderController {
         }
 
         return ResponseEntity.ok(ApiResponse.success(orders, message));
+    }
+
+    @PostMapping("/{id}/ship")
+    public ResponseEntity<ApiResponse<SalesOrderDTO>> markOrderShipped(@PathVariable Long id) {
+        // Find shipment for sales order and mark it as in-transit (shipped)
+        com.example.demo.dto.ShipmentDTO shipment = shipmentService.getShipmentBySalesOrder(id);
+        shipmentService.markInTransit(shipment.getId());
+        SalesOrderDTO updatedOrder = salesOrderService.getOrderById(id);
+        return ResponseEntity.ok(ApiResponse.success(updatedOrder, "Sales order marked as SHIPPED"));
+    }
+
+    @PostMapping("/{id}/deliver")
+    public ResponseEntity<ApiResponse<SalesOrderDTO>> markOrderDelivered(@PathVariable Long id) {
+        // Find shipment for sales order and mark it as delivered
+        com.example.demo.dto.ShipmentDTO shipment = shipmentService.getShipmentBySalesOrder(id);
+        shipmentService.markDelivered(shipment.getId());
+        SalesOrderDTO updatedOrder = salesOrderService.getOrderById(id);
+        return ResponseEntity.ok(ApiResponse.success(updatedOrder, "Sales order marked as DELIVERED"));
     }
 }
