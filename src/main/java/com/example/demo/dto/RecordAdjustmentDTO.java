@@ -19,9 +19,9 @@ public class RecordAdjustmentDTO {
     @NotNull(message = "Warehouse ID must not be null")
     private Long warehouseId;
 
-    @NotNull(message = "Quantity adjustment must not be null")
-    @Min(value = 1, message = "Quantity adjustment must be at least 1")
-    private Integer quantityAdjustment;
+    @NotNull(message = "Quantity must not be null")
+    @Min(value = 1, message = "Quantity must be at least 1")
+    private Integer quantity;
 
     @NotNull(message = "Adjustment type must not be null")
     private AdjustmentType adjustmentType;

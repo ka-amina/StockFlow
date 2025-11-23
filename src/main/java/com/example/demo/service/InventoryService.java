@@ -120,7 +120,7 @@ public class InventoryService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "No inventory found for this product in this warehouse. Use INBOUND to create initial stock."));
 
-        int adjustmentQuantity = dto.getQuantityAdjustment();
+        int adjustmentQuantity = dto.getQuantity();
         int signedQuantity;
 
         // Determine if increase or decrease
