@@ -20,6 +20,9 @@ public class SalesOrder {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "order_number", nullable = false, unique = true)
+    private String orderNumber;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id", nullable = false)
     private Client client;
@@ -44,6 +47,9 @@ public class SalesOrder {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "order_date", nullable = false)
+    private LocalDateTime orderDate;
+
     private LocalDateTime reservedAt;
 
     private LocalDateTime shippedAt;
@@ -57,6 +63,12 @@ public class SalesOrder {
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
+        if (orderDate == null) {
+            orderDate = LocalDateTime.now();
+        }
+        if (orderNumber == null) {
+            orderNumber = "SO-" + System.currentTimeMillis();
+        }
     }
 
     // Helper method to add order line

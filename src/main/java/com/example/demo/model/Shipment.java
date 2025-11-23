@@ -40,6 +40,8 @@ public class Shipment {
 
     private LocalDateTime deliveredDate;
 
+    private String notes;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
