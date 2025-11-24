@@ -78,4 +78,12 @@ public class ProductService {
     public ProductDTO deactivateProduct(Long id) {
         return setActive(id, false);
     }
+
+    @Transactional(readOnly = true)
+    public ProductDTO getProductBySku(String sku) {
+        Product product = repo.findBySku(sku)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, 
+                        "Product not found with SKU: " + sku));
+        return mapper.toDto(product);
+    }
 }
