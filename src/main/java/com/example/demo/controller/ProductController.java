@@ -28,6 +28,13 @@ public class ProductController {
         return ResponseEntity.ok(body);
     }
 
+    @GetMapping("/sku/{sku}")
+    public ResponseEntity<ApiResponse<ProductDTO>> getProductBySku(@PathVariable String sku) {
+        ProductDTO product = service.getProductBySku(sku);
+        ApiResponse<ProductDTO> body = new ApiResponse<>("Product found", product);
+        return ResponseEntity.ok(body);
+    }
+
     @PostMapping
     public ResponseEntity<ApiResponse<ProductDTO>> createProduct(@Valid @RequestBody ProductDTO dto) {
         ProductDTO created = service.createProduct(dto);
