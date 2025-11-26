@@ -34,12 +34,21 @@ pipeline {
             }
             post {
                 always {
+                    // Publish JUnit test results
                     junit '**/target/surefire-reports/*.xml'
+                    
+                    // Publish JaCoCo coverage report
                     jacoco(
                         execPattern: '**/target/jacoco.exec',
                         classPattern: '**/target/classes',
                         sourcePattern: '**/src/main/java',
-                        exclusionPattern: '**/dto/**,**/mapper/**,**/model/**,**/enums/**'
+                        exclusionPattern: '**/dto/**,**/mapper/**,**/model/**,**/enums/**,**/config/**,**/exception/**,**/DemoApplication.class',
+                        minimumInstructionCoverage: '80',
+                        minimumBranchCoverage: '75',
+                        minimumLineCoverage: '80',
+                        maximumInstructionCoverage: '100',
+                        maximumBranchCoverage: '100',
+                        maximumLineCoverage: '100'
                     )
                 }
             }
@@ -47,16 +56,22 @@ pipeline {
         
         stage('Code Coverage Report') {
             steps {
-                echo '📊 Generating code coverage report...'
+                echo '📊 Generating detailed code coverage report...'
                 sh './mvnw jacoco:report'
+                
+                // Publish HTML coverage report
                 publishHTML(target: [
                     allowMissing: false,
                     alwaysLinkToLastBuild: true,
                     keepAll: true,
                     reportDir: 'target/site/jacoco',
                     reportFiles: 'index.html',
-                    reportName: 'JaCoCo Coverage Report'
+                    reportName: 'JaCoCo Coverage Report',
+                    reportTitles: 'Code Coverage'
                 ])
+                
+                // Archive coverage data
+                archiveArtifacts artifacts: '**/target/site/jacoco/**', allowEmptyArchive: true
             }
         }
         
