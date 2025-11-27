@@ -50,11 +50,8 @@ jobs:
         distribution: 'temurin'
         cache: maven
     
-    - name: Build and Test
-      run: mvn clean test
-      
-    - name: Generate JaCoCo Coverage Report
-      run: mvn jacoco:report
+    - name: Build and Test with Coverage
+      run: mvn clean verify
       
     - name: SonarCloud Scan
       env:
