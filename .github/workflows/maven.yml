@@ -45,7 +45,7 @@ jobs:
         cache: maven
     
     - name: Build and Test with Coverage
-      run: mvn clean test jacoco:report
+      run: mvn clean verify
       
     - name: Verify JaCoCo Reports Generated
       run: |
