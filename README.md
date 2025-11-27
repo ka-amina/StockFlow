@@ -315,13 +315,19 @@ open target/site/jacoco/index.html
 **📚 SonarQube Documentation**:
 - [Complete Setup Guide](./docs/SONARQUBE_SETUP.md) - Full configuration steps
 - [Quick Start (5 min)](./docs/SONARQUBE_QUICKSTART.md) - Fast track setup
+- [Quality Gates Configuration](./docs/QUALITY_GATES_SETUP.md) - Detailed quality requirements
 
 **Quality Targets**:
-- Bugs: 0 on new code
-- Vulnerabilities: 0 on new code
-- Code Smells: Grade A
-- Coverage: ≥ 80%
-- Duplications: ≤ 5% global, ≤ 3% new
+
+| Metric | Overall Code | New Code |
+|--------|--------------|----------|
+| **Coverage** | ≥ 80% | ≥ 90% |
+| **Duplications** | ≤ 5% | ≤ 3% |
+| **Bugs** | - | 0 |
+| **Vulnerabilities** | - | 0 |
+| **Maintainability** | Rating A | Rating A |
+
+*Note: DTOs, Mappers, Models, and Enums are excluded from coverage calculation*
 
 ### Test Coverage Areas
 - Stock availability validation

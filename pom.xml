@@ -41,6 +41,8 @@
             <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
             <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
             <sonar.language>java</sonar.language>
+            
+            <!-- Exclusions -->
             <sonar.exclusions>
                 **/dto/**,
                 **/mapper/**,
@@ -59,6 +61,17 @@
                 **/exception/**,
                 **/DemoApplication.java
             </sonar.coverage.exclusions>
+            
+            <!-- Quality Gate Thresholds -->
+            <!-- Coverage: Global ≥ 80%, New code ≥ 90% -->
+            <sonar.coverage.overall.minimum>80</sonar.coverage.overall.minimum>
+            <sonar.coverage.new.minimum>90</sonar.coverage.new.minimum>
+            
+            <!-- Duplication: Global ≤ 5%, New code ≤ 3% -->
+            <sonar.cpd.exclusions>**/dto/**,**/mapper/**,**/model/**</sonar.cpd.exclusions>
+            
+            <!-- Bugs and Vulnerabilities: 0 on new code -->
+            <sonar.qualitygate.wait>true</sonar.qualitygate.wait>
     </properties>
     <dependencies>
         <dependency>
