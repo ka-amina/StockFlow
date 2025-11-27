@@ -98,8 +98,23 @@ The application follows a clean layered architecture:
 - Java 17 (JDK 17.0.17 or compatible)
 - PostgreSQL 12+ (or use H2 for development)
 - Maven 3.6+
+- Docker & Docker Compose (optional, for containerized deployment)
 
 ### Installation
+
+#### Option 1: Run with Docker (Recommended)
+```bash
+# Clone the repository
+git clone https://github.com/ka-amina/StockFlow.git
+cd StockFlow
+
+# Start all services (app + PostgreSQL)
+docker-compose up -d
+
+# Application available at http://localhost:8080
+```
+
+#### Option 2: Run Locally
 
 1. **Clone the repository**
    ```bash
@@ -123,13 +138,14 @@ The application follows a clean layered architecture:
 3. **Build the project**
    ```bash
    # Use Java 17 explicitly
-   JAVA_HOME=/path/to/java17 ./mvnw clean install
+   export JAVA_HOME=$(/usr/libexec/java_home -v 17)  # macOS
+   ./mvnw clean install
    ```
 
 4. **Run the application**
    ```bash
    # Using Maven
-   JAVA_HOME=/path/to/java17 ./mvnw spring-boot:run
+   ./mvnw spring-boot:run
    
    # Or run the JAR
    java -jar target/stockflow-0.0.1-SNAPSHOT.jar
@@ -138,6 +154,26 @@ The application follows a clean layered architecture:
 5. **Access the application**
    - API: http://localhost:8080
    - H2 Console: http://localhost:8080/h2-console
+
+### 🐳 Docker Deployment
+
+The application is fully containerized and automatically built in CI/CD:
+
+```bash
+# Pull latest image from GitHub Container Registry
+docker pull ghcr.io/ka-amina/stockflow:latest
+
+# Run with docker-compose (includes PostgreSQL)
+docker-compose up -d
+
+# Or run standalone container
+docker run -d \
+  -p 8080:8080 \
+  -e SPRING_DATASOURCE_URL=jdbc:postgresql://host:5432/stockflow_db \
+  ghcr.io/ka-amina/stockflow:latest
+```
+
+**📖 Full Docker Documentation**: [docs/DOCKER_INTEGRATION.md](./docs/DOCKER_INTEGRATION.md)
 
 ## 📚 API Documentation
 
