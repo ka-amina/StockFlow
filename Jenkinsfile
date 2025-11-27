@@ -7,7 +7,9 @@ pipeline {
     }
     
     environment {
-        SONAR_HOST_URL = 'http://sonarqube:9000'
+        SONAR_HOST_URL = 'https://sonarcloud.io'
+        SONAR_ORGANIZATION = 'ka-amina'
+        SONAR_PROJECT_KEY = 'ka-amina_StockFlow'
         DOCKER_IMAGE = 'stockflow'
         DOCKER_TAG = "${env.BUILD_NUMBER}"
     }
@@ -75,11 +77,16 @@ pipeline {
             }
         }
         
-        stage('SonarQube Analysis') {
+        stage('SonarCloud Analysis') {
             steps {
-                echo '🔍 Running SonarQube analysis...'
-                withSonarQubeEnv('SonarQube') {
-                    sh './mvnw sonar:sonar'
+                echo '🔍 Running SonarCloud analysis...'
+                withSonarQubeEnv('SonarCloud') {
+                    sh '''
+                        ./mvnw clean verify sonar:sonar \
+                        -Dsonar.organization=ka-amina \
+                        -Dsonar.projectKey=ka-amina_StockFlow \
+                        -Dsonar.host.url=https://sonarcloud.io
+                    '''
                 }
             }
         }
