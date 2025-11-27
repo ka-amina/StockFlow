@@ -53,12 +53,16 @@ jobs:
     - name: Build and Test with Coverage
       run: mvn clean verify
       
-    - name: SonarCloud Scan
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: mvn sonar:sonar -Dsonar.projectKey=ka-amina_StockFlow
-      continue-on-error: true
+    - name: Verify JaCoCo Reports Generated
+      run: |
+        echo "Checking for JaCoCo reports..."
+        ls -la target/site/jacoco/ || echo "JaCoCo directory not found!"
+        if [ -f "target/site/jacoco/jacoco.csv" ]; then
+          echo "✅ jacoco.csv found"
+          head -5 target/site/jacoco/jacoco.csv
+        else
+          echo "❌ jacoco.csv NOT found"
+        fi
       
     - name: Upload Coverage Reports
       uses: actions/upload-artifact@v4
@@ -78,6 +82,13 @@ jobs:
       run: |
         echo "Coverage: ${{ steps.jacoco.outputs.coverage }}"
         echo "Branch Coverage: ${{ steps.jacoco.outputs.branches }}"
+      
+    - name: SonarCloud Scan
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: mvn sonar:sonar -Dsonar.projectKey=ka-amina_StockFlow
+      continue-on-error: true
         
     - name: Package Application
       run: mvn package -DskipTests
