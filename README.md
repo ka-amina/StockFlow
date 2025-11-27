@@ -279,16 +279,49 @@ SalesOrderLine (id, salesOrder, product, quantity, unitPrice) [Planned]
 Shipment (id, salesOrder, carrier, trackingNumber, status) [Planned]
 ```
 
-## 🧪 Testing
+## 🧪 Testing & Quality
 
 ### Run Tests
 ```bash
 # Run all tests
 ./mvnw test
 
-# Run with coverage
-./mvnw test jacoco:report
+# Run with coverage report
+./mvnw clean test
+
+# Run verification with coverage check (fails if <80%)
+./mvnw clean verify
+
+# View coverage report
+open target/site/jacoco/index.html
 ```
+
+### Code Coverage
+- **Target**: 80% line coverage, 75% branch coverage
+- **Tool**: JaCoCo 0.8.12
+- **Reports**: HTML, XML, CSV formats
+- **CI/CD Integration**: Automatic coverage tracking in pipeline
+
+**📚 Coverage Documentation**:
+- [JaCoCo Setup Guide](./docs/JACOCO_SETUP.md)
+- [Quick Reference](./docs/JACOCO_QUICKREF.md)
+
+### Code Quality (SonarQube)
+- **Platform**: SonarCloud (free for public repos)
+- **Analysis**: Automatic on every push/PR
+- **Metrics**: Bugs, vulnerabilities, code smells, coverage, duplications
+- **Quality Gates**: Enforced before merging
+
+**📚 SonarQube Documentation**:
+- [Complete Setup Guide](./docs/SONARQUBE_SETUP.md) - Full configuration steps
+- [Quick Start (5 min)](./docs/SONARQUBE_QUICKSTART.md) - Fast track setup
+
+**Quality Targets**:
+- Bugs: 0 on new code
+- Vulnerabilities: 0 on new code
+- Code Smells: Grade A
+- Coverage: ≥ 80%
+- Duplications: ≤ 5% global, ≤ 3% new
 
 ### Test Coverage Areas
 - Stock availability validation
@@ -299,7 +332,15 @@ Shipment (id, salesOrder, carrier, trackingNumber, status) [Planned]
 - Shipment planning
 - Business exceptions
 - DTO validation
-- MapStruct mappers
+- Service layer business logic
+
+### Excluded from Coverage
+- DTOs (Data Transfer Objects)
+- Mappers (MapStruct generated code)
+- Entity models
+- Enums
+- Configuration classes
+- Exception classes
 
 ## 🔧 Configuration
 
