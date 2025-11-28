@@ -145,4 +145,118 @@ class ProductServiceTest {
         // Then
         assertEquals(2, result.size());
     }
+
+    @Test
+    void createProduct_NullSku_ThrowsException() {
+        ProductDTO request = new ProductDTO();
+        request.setSku(null);
+        request.setName("Test");
+
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+                () -> productService.createProduct(request));
+
+        assertTrue(exception.getReason().contains("SKU must not be blank"));
+        verify(productRepository, never()).save(any());
+    }
+
+    @Test
+    void createProduct_BlankSku_ThrowsException() {
+        ProductDTO request = new ProductDTO();
+        request.setSku("   ");
+        request.setName("Test");
+
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+                () -> productService.createProduct(request));
+
+        assertTrue(exception.getReason().contains("SKU must not be blank"));
+        verify(productRepository, never()).save(any());
+    }
+
+    @Test
+    void updateProduct_Success() {
+        Product product = new Product();
+        product.setId(1L);
+        product.setSku("SKU-001");
+
+        ProductDTO updateDTO = new ProductDTO();
+        updateDTO.setSku("SKU-001");
+        updateDTO.setName("Updated");
+
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+        when(productRepository.findBySku("SKU-001")).thenReturn(Optional.of(product));
+        when(productRepository.save(product)).thenReturn(product);
+        when(productMapper.toDto(product)).thenReturn(updateDTO);
+
+        ProductDTO result = productService.updateProduct(1L, updateDTO);
+
+        assertNotNull(result);
+        verify(productRepository).save(product);
+    }
+
+    @Test
+    void updateProduct_NotFound_ThrowsException() {
+        when(productRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThrows(ResponseStatusException.class,
+                () -> productService.updateProduct(999L, new ProductDTO()));
+
+        verify(productRepository, never()).save(any());
+    }
+
+    @Test
+    void updateProduct_DuplicateSku_ThrowsException() {
+        Product product1 = new Product();
+        product1.setId(1L);
+
+        Product product2 = new Product();
+        product2.setId(2L);
+        product2.setSku("SKU-002");
+
+        ProductDTO updateDTO = new ProductDTO();
+        updateDTO.setSku("SKU-002");
+
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product1));
+        when(productRepository.findBySku("SKU-002")).thenReturn(Optional.of(product2));
+
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+                () -> productService.updateProduct(1L, updateDTO));
+
+        assertTrue(exception.getReason().contains("SKU already exists"));
+        verify(productRepository, never()).save(any());
+    }
+
+    @Test
+    void setActive_NotFound_ThrowsException() {
+        when(productRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThrows(ResponseStatusException.class,
+                () -> productService.setActive(999L, true));
+
+        verify(productRepository, never()).save(any());
+    }
+
+    @Test
+    void activateProduct_NotFound_ThrowsException() {
+        when(productRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThrows(ResponseStatusException.class,
+                () -> productService.activateProduct(999L));
+    }
+
+    @Test
+    void deactivateProduct_NotFound_ThrowsException() {
+        when(productRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThrows(ResponseStatusException.class,
+                () -> productService.deactivateProduct(999L));
+    }
+
+    @Test
+    void getProducts_EmptyList() {
+        when(productRepository.findAll()).thenReturn(List.of());
+
+        List<ProductDTO> result = productService.getProducts();
+
+        assertTrue(result.isEmpty());
+    }
 }

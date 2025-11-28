@@ -166,4 +166,165 @@ class ShipmentServiceTest {
         // Then
         assertNotNull(result);
     }
+
+    @Test
+    void createShipment_SalesOrderNotFound() {
+        CreateShipmentDTO request = new CreateShipmentDTO();
+        request.setSalesOrderId(999L);
+
+        when(salesOrderRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThrows(ResponseStatusException.class,
+                () -> shipmentService.createShipment(request));
+    }
+
+    @Test
+    void createShipment_CarrierNotFound() {
+        CreateShipmentDTO request = new CreateShipmentDTO();
+        request.setSalesOrderId(1L);
+        request.setCarrierId(999L);
+
+        SalesOrder salesOrder = new SalesOrder();
+        salesOrder.setStatus(com.example.demo.enums.SalesOrderStatus.RESERVED);
+        when(salesOrderRepository.findById(1L)).thenReturn(Optional.of(salesOrder));
+        when(carrierRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThrows(ResponseStatusException.class,
+                () -> shipmentService.createShipment(request));
+    }
+
+    @Test
+    void createShipment_DuplicateTrackingNumber() {
+        CreateShipmentDTO request = new CreateShipmentDTO();
+        request.setSalesOrderId(1L);
+        request.setCarrierId(1L);
+        request.setTrackingNumber("TRACK123");
+
+        SalesOrder salesOrder = new SalesOrder();
+        salesOrder.setStatus(com.example.demo.enums.SalesOrderStatus.RESERVED);
+        Carrier carrier = new Carrier();
+
+        when(salesOrderRepository.findById(1L)).thenReturn(Optional.of(salesOrder));
+        when(carrierRepository.findById(1L)).thenReturn(Optional.of(carrier));
+        when(shipmentRepository.findBySalesOrder(salesOrder)).thenReturn(Optional.empty());
+        when(shipmentRepository.existsByTrackingNumber("TRACK123")).thenReturn(true);
+
+        assertThrows(ResponseStatusException.class,
+                () -> shipmentService.createShipment(request));
+    }
+
+    @Test
+    void updateCarrier_Success() {
+        Shipment shipment = new Shipment();
+        shipment.setId(1L);
+        Carrier newCarrier = new Carrier();
+        newCarrier.setId(2L);
+
+        when(shipmentRepository.findById(1L)).thenReturn(Optional.of(shipment));
+        when(carrierRepository.findById(2L)).thenReturn(Optional.of(newCarrier));
+        when(shipmentRepository.save(shipment)).thenReturn(shipment);
+        when(shipmentMapper.toDto(shipment)).thenReturn(new ShipmentDTO());
+
+        ShipmentDTO result = shipmentService.updateCarrier(1L, 2L);
+
+        assertNotNull(result);
+        verify(shipmentRepository).save(shipment);
+    }
+
+    @Test
+    void updateCarrier_ShipmentNotFound() {
+        when(shipmentRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThrows(ResponseStatusException.class,
+                () -> shipmentService.updateCarrier(999L, 1L));
+    }
+
+    @Test
+    void updateCarrier_CarrierNotFound() {
+        Shipment shipment = new Shipment();
+        when(shipmentRepository.findById(1L)).thenReturn(Optional.of(shipment));
+        when(carrierRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThrows(ResponseStatusException.class,
+                () -> shipmentService.updateCarrier(1L, 999L));
+    }
+
+    @Test
+    void updateTrackingNumber_Success() {
+        Shipment shipment = new Shipment();
+        shipment.setId(1L);
+
+        when(shipmentRepository.findById(1L)).thenReturn(Optional.of(shipment));
+        when(shipmentRepository.save(shipment)).thenReturn(shipment);
+        when(shipmentMapper.toDto(shipment)).thenReturn(new ShipmentDTO());
+
+        ShipmentDTO result = shipmentService.updateTrackingNumber(1L, "NEW-TRACK");
+
+        assertNotNull(result);
+        verify(shipmentRepository).save(shipment);
+    }
+
+    @Test
+    void getShipmentById_Success() {
+        Shipment shipment = new Shipment();
+        shipment.setId(1L);
+
+        when(shipmentRepository.findById(1L)).thenReturn(Optional.of(shipment));
+        when(shipmentMapper.toDto(shipment)).thenReturn(new ShipmentDTO());
+
+        ShipmentDTO result = shipmentService.getShipmentById(1L);
+
+        assertNotNull(result);
+    }
+
+    @Test
+    void getShipmentById_NotFound() {
+        when(shipmentRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThrows(ResponseStatusException.class,
+                () -> shipmentService.getShipmentById(999L));
+    }
+
+    @Test
+    void getAllShipments_Success() {
+        Shipment shipment1 = new Shipment();
+        Shipment shipment2 = new Shipment();
+
+        when(shipmentRepository.findAll()).thenReturn(java.util.List.of(shipment1, shipment2));
+        when(shipmentMapper.toDto(any())).thenReturn(new ShipmentDTO());
+
+        var result = shipmentService.getAllShipments();
+
+        assertEquals(2, result.size());
+    }
+
+    @Test
+    void getShipmentsByStatus_Success() {
+        Shipment shipment = new Shipment();
+        shipment.setStatus(ShipmentStatus.IN_TRANSIT);
+
+        when(shipmentRepository.findByStatus(ShipmentStatus.IN_TRANSIT))
+                .thenReturn(java.util.List.of(shipment));
+        when(shipmentMapper.toDto(any())).thenReturn(new ShipmentDTO());
+
+        var result = shipmentService.getShipmentsByStatus(ShipmentStatus.IN_TRANSIT);
+
+        assertEquals(1, result.size());
+    }
+
+    @Test
+    void markInTransit_ShipmentNotFound() {
+        when(shipmentRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThrows(ResponseStatusException.class,
+                () -> shipmentService.markInTransit(999L));
+    }
+
+    @Test
+    void markDelivered_ShipmentNotFound() {
+        when(shipmentRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThrows(ResponseStatusException.class,
+                () -> shipmentService.markDelivered(999L));
+    }
 }
