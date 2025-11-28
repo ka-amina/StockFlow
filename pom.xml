@@ -44,6 +44,7 @@
             
             <!-- Exclusions -->
             <sonar.exclusions>
+                **/dto/**,
                 **/mapper/**,
                 **/model/**,
                 **/enums/**,
@@ -52,6 +53,7 @@
                 **/DemoApplication.java
             </sonar.exclusions>
             <sonar.coverage.exclusions>
+                **/dto/**,
                 **/mapper/**,
                 **/model/**,
                 **/enums/**,
