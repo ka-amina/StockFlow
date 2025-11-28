@@ -123,4 +123,93 @@ class UserServiceTest {
         assertFalse(user.getActive());
         verify(userRepository).save(user);
     }
+
+    @Test
+    void deactivateUser_NotFound() {
+        when(userRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThrows(ResponseStatusException.class,
+                () -> userService.deactivateUser(999L));
+    }
+
+    @Test
+    void updateUser_Success() {
+        User user = new User();
+        user.setId(1L);
+        user.setEmail("old@example.com");
+        user.setRole(Role.CLIENT);
+
+        UserDTO updateDTO = new UserDTO();
+        updateDTO.setEmail("new@example.com");
+        updateDTO.setRole(Role.ADMIN);
+        updateDTO.setActive(true);
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.existsByEmail("new@example.com")).thenReturn(false);
+        when(userRepository.save(any())).thenReturn(user);
+
+        UserDTO result = userService.updateUser(1L, updateDTO);
+
+        assertNotNull(result);
+        verify(userRepository).save(any());
+    }
+
+    @Test
+    void updateUser_DuplicateEmail() {
+        User user = new User();
+        user.setId(1L);
+        user.setEmail("old@example.com");
+
+        UserDTO updateDTO = new UserDTO();
+        updateDTO.setEmail("existing@example.com");
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.existsByEmail("existing@example.com")).thenReturn(true);
+
+        assertThrows(ResponseStatusException.class,
+                () -> userService.updateUser(1L, updateDTO));
+    }
+
+    @Test
+    void updateUser_NotFound() {
+        UserDTO updateDTO = new UserDTO();
+        updateDTO.setEmail("test@example.com");
+
+        when(userRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThrows(ResponseStatusException.class,
+                () -> userService.updateUser(999L, updateDTO));
+    }
+
+    @Test
+    void getAllUsers_Success() {
+        User user1 = new User();
+        User user2 = new User();
+
+        when(userRepository.findAll()).thenReturn(List.of(user1, user2));
+
+        List<UserDTO> result = userService.getAllUsers();
+
+        assertEquals(2, result.size());
+    }
+
+    @Test
+    void getUserByEmail_Success() {
+        User user = new User();
+        user.setEmail("test@example.com");
+
+        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+
+        UserDTO result = userService.getUserByEmail("test@example.com");
+
+        assertNotNull(result);
+    }
+
+    @Test
+    void getUserByEmail_NotFound() {
+        when(userRepository.findByEmail("nonexistent@example.com")).thenReturn(Optional.empty());
+
+        assertThrows(ResponseStatusException.class,
+                () -> userService.getUserByEmail("nonexistent@example.com"));
+    }
 }

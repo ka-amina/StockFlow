@@ -162,4 +162,29 @@ class AuthServiceTest {
         // Then
         assertFalse(result);
     }
+
+    @Test
+    void getCurrentUser_UserNotFoundAfterAuth() {
+        when(session.getAttribute("authenticated_user")).thenReturn(1L);
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(ResponseStatusException.class,
+                () -> authService.getCurrentUser(session));
+    }
+
+    @Test
+    void login_NullPassword() {
+        LoginDTO loginDTO = new LoginDTO();
+        loginDTO.setEmail("test@example.com");
+        loginDTO.setPassword(null);
+
+        User user = new User();
+        user.setPasswordHash("password123");
+        user.setActive(true);
+
+        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+
+        assertThrows(ResponseStatusException.class,
+                () -> authService.login(loginDTO, session));
+    }
 }

@@ -128,4 +128,35 @@ class SupplierServiceTest {
         verify(supplierRepository).findAll();
         verify(supplierMapper).toDto(supplier);
     }
+
+    @Test
+    void createSupplier_WithDifferentName_Success() {
+        SupplierDTO differentDTO = new SupplierDTO();
+        differentDTO.setName("Different Supplier");
+
+        Supplier differentSupplier = new Supplier();
+        differentSupplier.setName("Different Supplier");
+
+        when(supplierMapper.toEntity(differentDTO)).thenReturn(differentSupplier);
+        when(supplierRepository.save(differentSupplier)).thenReturn(differentSupplier);
+        when(supplierMapper.toDto(differentSupplier)).thenReturn(differentDTO);
+
+        SupplierDTO result = supplierService.createSupplier(differentDTO);
+
+        assertNotNull(result);
+        assertEquals("Different Supplier", result.getName());
+        verify(supplierRepository).save(differentSupplier);
+    }
+
+    @Test
+    void getSuppliers_VerifyMapperCalls() {
+        List<Supplier> suppliers = Arrays.asList(supplier, new Supplier());
+        when(supplierRepository.findAll()).thenReturn(suppliers);
+        when(supplierMapper.toDto(any(Supplier.class))).thenReturn(supplierDTO);
+
+        List<SupplierDTO> result = supplierService.getSuppliers();
+
+        assertEquals(2, result.size());
+        verify(supplierMapper, times(2)).toDto(any(Supplier.class));
+    }
 }

@@ -174,4 +174,157 @@ class SalesOrderServiceTest {
         assertThrows(ResponseStatusException.class, () ->
                 salesOrderService.getOrderById(999L));
     }
+
+    @Test
+    void createOrder_InactiveClient() {
+        CreateSalesOrderDTO request = new CreateSalesOrderDTO();
+        request.setClientId(1L);
+        request.setWarehouseId(1L);
+
+        Client client = new Client();
+        client.setActive(false);
+
+        when(clientRepository.findById(1L)).thenReturn(Optional.of(client));
+
+        assertThrows(ResponseStatusException.class,
+                () -> salesOrderService.createOrder(request));
+    }
+
+    @Test
+    void createOrder_WarehouseNotFound() {
+        CreateSalesOrderDTO request = new CreateSalesOrderDTO();
+        request.setClientId(1L);
+        request.setWarehouseId(999L);
+
+        Client client = new Client();
+        client.setActive(true);
+
+        when(clientRepository.findById(1L)).thenReturn(Optional.of(client));
+        when(warehouseRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThrows(ResponseStatusException.class,
+                () -> salesOrderService.createOrder(request));
+    }
+
+    @Test
+    void createOrder_InactiveWarehouse() {
+        CreateSalesOrderDTO request = new CreateSalesOrderDTO();
+        request.setClientId(1L);
+        request.setWarehouseId(1L);
+
+        Client client = new Client();
+        client.setActive(true);
+        Warehouse warehouse = new Warehouse();
+        warehouse.setActive(false);
+
+        when(clientRepository.findById(1L)).thenReturn(Optional.of(client));
+        when(warehouseRepository.findById(1L)).thenReturn(Optional.of(warehouse));
+
+        assertThrows(ResponseStatusException.class,
+                () -> salesOrderService.createOrder(request));
+    }
+
+    @Test
+    void createOrder_EmptyOrderLines() {
+        CreateSalesOrderDTO request = new CreateSalesOrderDTO();
+        request.setClientId(1L);
+        request.setWarehouseId(1L);
+        request.setOrderLines(new ArrayList<>());
+
+        Client client = new Client();
+        client.setActive(true);
+        Warehouse warehouse = new Warehouse();
+        warehouse.setActive(true);
+
+        when(clientRepository.findById(1L)).thenReturn(Optional.of(client));
+        when(warehouseRepository.findById(1L)).thenReturn(Optional.of(warehouse));
+
+        assertThrows(ResponseStatusException.class,
+                () -> salesOrderService.createOrder(request));
+    }
+
+    @Test
+    void createOrder_InactiveProduct() {
+        CreateSalesOrderDTO request = new CreateSalesOrderDTO();
+        request.setClientId(1L);
+        request.setWarehouseId(1L);
+
+        CreateSalesOrderDTO.CreateSalesOrderLineDTO lineDto = new CreateSalesOrderDTO.CreateSalesOrderLineDTO();
+        lineDto.setProductId(1L);
+        lineDto.setQuantity(5);
+        lineDto.setUnitPrice(BigDecimal.valueOf(100));
+        request.setOrderLines(List.of(lineDto));
+
+        Client client = new Client();
+        client.setActive(true);
+        Warehouse warehouse = new Warehouse();
+        warehouse.setActive(true);
+        Product product = new Product();
+        product.setActive(false);
+        product.setSku("SKU-001");
+
+        when(clientRepository.findById(1L)).thenReturn(Optional.of(client));
+        when(warehouseRepository.findById(1L)).thenReturn(Optional.of(warehouse));
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+
+        assertThrows(ResponseStatusException.class,
+                () -> salesOrderService.createOrder(request));
+    }
+
+    @Test
+    void reserveOrder_NotFound() {
+        when(salesOrderRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThrows(ResponseStatusException.class,
+                () -> salesOrderService.reserveOrder(999L));
+    }
+
+    @Test
+    void cancelOrder_NotFound() {
+        when(salesOrderRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThrows(ResponseStatusException.class,
+                () -> salesOrderService.cancelOrder(999L));
+    }
+
+    @Test
+    void getAllOrders_Success() {
+        SalesOrder order1 = new SalesOrder();
+        SalesOrder order2 = new SalesOrder();
+
+        when(salesOrderRepository.findAll()).thenReturn(List.of(order1, order2));
+        when(salesOrderMapper.toDto(any())).thenReturn(new SalesOrderDTO());
+
+        var result = salesOrderService.getAllOrders();
+
+        assertEquals(2, result.size());
+    }
+
+    @Test
+    void getOrdersByClient_Success() {
+        Client client = new Client();
+        client.setId(1L);
+        SalesOrder order = new SalesOrder();
+
+        when(clientRepository.findById(1L)).thenReturn(Optional.of(client));
+        when(salesOrderRepository.findByClient(client)).thenReturn(List.of(order));
+        when(salesOrderMapper.toDto(any())).thenReturn(new SalesOrderDTO());
+
+        var result = salesOrderService.getOrdersByClient(1L);
+
+        assertEquals(1, result.size());
+    }
+
+    @Test
+    void getOrdersByStatus_Success() {
+        SalesOrder order = new SalesOrder();
+
+        when(salesOrderRepository.findByStatus(SalesOrderStatus.CREATED))
+                .thenReturn(List.of(order));
+        when(salesOrderMapper.toDto(any())).thenReturn(new SalesOrderDTO());
+
+        var result = salesOrderService.getOrdersByStatus(SalesOrderStatus.CREATED);
+
+        assertEquals(1, result.size());
+    }
 }

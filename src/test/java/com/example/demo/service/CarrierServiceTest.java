@@ -233,4 +233,57 @@ class CarrierServiceTest {
         assertThrows(ResponseStatusException.class, () ->
                 carrierService.updateCarrierStatus(999L, CarrierStatus.INACTIVE));
     }
+
+    @Test
+    void deleteCarrier_Success() {
+        Carrier carrier = new Carrier();
+        carrier.setId(1L);
+
+        when(carrierRepo.findById(1L)).thenReturn(Optional.of(carrier));
+
+        carrierService.updateCarrierStatus(1L, CarrierStatus.INACTIVE);
+
+        assertEquals(CarrierStatus.INACTIVE, carrier.getStatus());
+        verify(carrierRepo).save(carrier);
+    }
+
+    @Test
+    void getAllCarriers_EmptyList() {
+        when(carrierRepo.findAll()).thenReturn(List.of());
+
+        List<CarrierDTO> result = carrierService.getAllCarriers();
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void getCarriersByStatus_EmptyList() {
+        when(carrierRepo.findByStatus(CarrierStatus.ACTIVE)).thenReturn(List.of());
+
+        List<CarrierDTO> result = carrierService.getCarriersByStatus(CarrierStatus.ACTIVE);
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void updateCarrier_SameCode_Success() {
+        CarrierDTO dto = new CarrierDTO();
+        dto.setCode("CARR-001");
+        dto.setName("Updated Name");
+        dto.setStatus(CarrierStatus.ACTIVE);
+
+        Carrier carrier = new Carrier();
+        carrier.setId(1L);
+        carrier.setCode("CARR-001");
+
+        when(carrierRepo.findById(1L)).thenReturn(Optional.of(carrier));
+        when(carrierRepo.save(carrier)).thenReturn(carrier);
+        when(mapper.toDto(carrier)).thenReturn(dto);
+
+        CarrierDTO result = carrierService.updateCarrier(1L, dto);
+
+        assertNotNull(result);
+        verify(carrierRepo).save(carrier);
+        verify(carrierRepo, never()).existsByCode("CARR-001");
+    }
 }
