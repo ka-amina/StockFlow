@@ -44,7 +44,6 @@
             
             <!-- Exclusions -->
             <sonar.exclusions>
-                **/dto/**,
                 **/mapper/**,
                 **/model/**,
                 **/enums/**,
@@ -53,7 +52,6 @@
                 **/DemoApplication.java
             </sonar.exclusions>
             <sonar.coverage.exclusions>
-                **/dto/**,
                 **/mapper/**,
                 **/model/**,
                 **/enums/**,
@@ -68,7 +66,7 @@
             <sonar.coverage.new.minimum>90</sonar.coverage.new.minimum>
             
             <!-- Duplication: Global ≤ 5%, New code ≤ 3% -->
-            <sonar.cpd.exclusions>**/dto/**,**/mapper/**,**/model/**</sonar.cpd.exclusions>
+            <sonar.cpd.exclusions>**/mapper/**,**/model/**</sonar.cpd.exclusions>
             
             <!-- Bugs and Vulnerabilities: 0 on new code -->
             <sonar.qualitygate.wait>true</sonar.qualitygate.wait>
