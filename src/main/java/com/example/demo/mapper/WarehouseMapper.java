@@ -3,6 +3,7 @@ package com.example.demo.mapper;
 import org.mapstruct.*;
 import com.example.demo.model.Warehouse;
 import com.example.demo.dto.WarehouseDTO;
+import org.springframework.context.annotation.Bean;
 
 @Mapper(componentModel = "spring")
 public interface WarehouseMapper {
