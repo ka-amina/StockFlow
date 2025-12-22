@@ -287,3 +287,4 @@ class CarrierServiceTest {
         verify(carrierRepo, never()).existsByCode("CARR-001");
     }
 }
+
