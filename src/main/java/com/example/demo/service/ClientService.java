@@ -3,11 +3,12 @@ package com.example.demo.service;
 import com.example.demo.dto.ClientDTO;
 import com.example.demo.dto.ClientAccountDTO;
 import com.example.demo.dto.RegisterClientDTO;
-import com.example.demo.enums.Role;
 import com.example.demo.model.Client;
 import com.example.demo.model.User;
+import com.example.demo.model.Roles;
 import com.example.demo.repository.ClientRepository;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.repository.UserRoleRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,10 +22,12 @@ public class ClientService {
 
     private final ClientRepository clientRepo;
     private final UserRepository userRepo;
+    private final UserRoleRepository userRoleRepository;
 
-    public ClientService(ClientRepository clientRepo, UserRepository userRepo) {
+    public ClientService(ClientRepository clientRepo, UserRepository userRepo, UserRoleRepository userRoleRepository) {
         this.clientRepo = clientRepo;
         this.userRepo = userRepo;
+        this.userRoleRepository = userRoleRepository;
     }
 
     @Transactional
@@ -41,11 +44,16 @@ public class ClientService {
                     "Client with email " + dto.getEmail() + " already exists");
         }
 
+        // Find CLIENT role
+        Roles clientRole = userRoleRepository.findByRoleName("CLIENT")
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                        "CLIENT role not found in system"));
+
         // Create User account with CLIENT role
         User user = User.builder()
                 .email(dto.getEmail())
                 .passwordHash(dto.getPassword())
-                .role(Role.CLIENT)
+                .role(clientRole)
                 .active(true)
                 .build();
 
@@ -79,11 +87,16 @@ public class ClientService {
                     "Client with email " + dto.getEmail() + " already exists");
         }
 
+        // Find CLIENT role
+        Roles clientRole = userRoleRepository.findByRoleName("CLIENT")
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                        "CLIENT role not found in system"));
+
         // Create User account with CLIENT role
         User user = User.builder()
                 .email(dto.getEmail())
                 .passwordHash(dto.getPassword()) 
-                .role(Role.CLIENT)
+                .role(clientRole)
                 .active(true)
                 .build();
 
@@ -175,7 +188,7 @@ public class ClientService {
         if (client.getUser() != null) {
             dto.setUserId(client.getUser().getId());
             dto.setUserEmail(client.getUser().getEmail());
-            dto.setUserRole(client.getUser().getRole().name());
+            dto.setUserRole(client.getUser().getRole().getRoleName());
         }
 
         return dto;

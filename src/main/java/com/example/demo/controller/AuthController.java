@@ -5,26 +5,39 @@ import com.example.demo.dto.AuthResponseDTO;
 import com.example.demo.dto.LoginDTO;
 import com.example.demo.model.User;
 import com.example.demo.service.AuthService;
+import com.example.demo.utils.JwtUtil;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
     private final AuthService authService;
-
-    public AuthController(AuthService authService) {
-        this.authService = authService;
-    }
+    private final AuthenticationManager authenticationManager;
+    private final JwtUtil jwtUtil;
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<AuthResponseDTO>> login(
-            @Valid @RequestBody LoginDTO dto,
-            HttpSession session) {
-        AuthResponseDTO response = authService.login(dto, session);
+            @Valid @RequestBody LoginDTO request) {
+        Authentication auth = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getEmail() , request.getPassword()));
+        UserDetails userDetails = (UserDetails) auth.getPrincipal();
+        String token = jwtUtil.generateToken(userDetails);
+        
+        AuthResponseDTO response = AuthResponseDTO.builder()
+                .token(token)
+                .email(userDetails.getUsername())
+                .build();
+        
         return ResponseEntity.ok(ApiResponse.success(response, "Login successful"));
     }
 
@@ -41,8 +54,6 @@ public class AuthController {
         AuthResponseDTO response = AuthResponseDTO.builder()
                 .userId(user.getId())
                 .email(user.getEmail())
-                .role(user.getRole())
-                .message("Current user retrieved")
                 .build();
         
         return ResponseEntity.ok(ApiResponse.success(response, "Current user retrieved"));

@@ -1,8 +1,9 @@
 package com.example.demo.model;
 
-import com.example.demo.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.*;
 
 @Entity
 @Table(name = "users")
@@ -22,11 +23,20 @@ public class User {
     @Column(nullable = false)
     private String passwordHash;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Role role;
-
     @Column(nullable = false)
     @Builder.Default
     private Boolean active = true;
+
+    @ManyToOne
+    @JoinColumn(name = "user_role_id" , nullable = false)
+    private Roles role;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_permissions",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "permission_id")
+    )
+    @Builder.Default
+    private Set<Permissions> permissions = new HashSet<>();
 }

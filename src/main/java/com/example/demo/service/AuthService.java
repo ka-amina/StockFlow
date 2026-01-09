@@ -44,8 +44,6 @@ public class AuthService {
         return AuthResponseDTO.builder()
                 .userId(user.getId())
                 .email(user.getEmail())
-                .role(user.getRole())
-                .message("Login successful")
                 .build();
     }
 

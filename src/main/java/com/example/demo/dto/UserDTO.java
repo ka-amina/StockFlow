@@ -1,6 +1,6 @@
 package com.example.demo.dto;
 
-import com.example.demo.enums.Role;
+import com.example.demo.model.Roles;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -25,7 +25,7 @@ public class UserDTO {
     private String password;
     
     @NotNull(message = "Role is required")
-    private Role role;
+    private Long role;
     
     private Boolean active;
 }
