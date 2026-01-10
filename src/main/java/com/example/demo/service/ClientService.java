@@ -5,7 +5,7 @@ import com.example.demo.dto.ClientAccountDTO;
 import com.example.demo.dto.RegisterClientDTO;
 import com.example.demo.model.Client;
 import com.example.demo.model.User;
-import com.example.demo.model.Roles;
+import com.example.demo.model.Role;
 import com.example.demo.repository.ClientRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.repository.UserRoleRepository;
@@ -45,7 +45,7 @@ public class ClientService {
         }
 
         // Find CLIENT role
-        Roles clientRole = userRoleRepository.findByRoleName("CLIENT")
+        Role clientRole = userRoleRepository.findByRoleName("CLIENT")
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
                         "CLIENT role not found in system"));
 
@@ -88,7 +88,7 @@ public class ClientService {
         }
 
         // Find CLIENT role
-        Roles clientRole = userRoleRepository.findByRoleName("CLIENT")
+        Role clientRole = userRoleRepository.findByRoleName("CLIENT")
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
                         "CLIENT role not found in system"));
 

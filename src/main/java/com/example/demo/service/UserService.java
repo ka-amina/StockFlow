@@ -3,7 +3,7 @@ package com.example.demo.service;
 import com.example.demo.dto.AuthResponseDTO;
 import com.example.demo.dto.UserDTO;
 import com.example.demo.mapper.UsersMapper;
-import com.example.demo.model.Roles;
+import com.example.demo.model.Role;
 import com.example.demo.model.User;
 import com.example.demo.model.UserPrincipal;
 import com.example.demo.repository.UserRepository;
@@ -41,7 +41,7 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Role ID is required");
         }
         
-        Roles role = userRoleRepository.findById(dto.getRole())
+        Role role = userRoleRepository.findById(dto.getRole())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role " + dto.getRole() + " not found"));
         user.setRole(role);
         user.setPasswordHash(passwordEncoder.encode(dto.getPassword()));

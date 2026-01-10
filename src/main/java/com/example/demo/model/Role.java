@@ -11,7 +11,7 @@ import java.util.*;
 @NoArgsConstructor
 @Builder
 @Data
-public class Roles {
+public class Role {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,6 +20,7 @@ public class Roles {
     @Column(name = "role_name", nullable = false,unique = true)
     private String roleName;
 
+    @Builder.Default
     @OneToMany(mappedBy = "role", orphanRemoval = true)
     private List<User> users = new ArrayList<>();
 }

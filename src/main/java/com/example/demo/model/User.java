@@ -27,9 +27,13 @@ public class User {
     @Builder.Default
     private Boolean active = true;
 
+    @Builder.Default
+    @OneToMany(mappedBy = "user" , fetch = FetchType.LAZY)
+    private List<RefreshToken> refreshTokens = new ArrayList<>();
+
     @ManyToOne
     @JoinColumn(name = "user_role_id" , nullable = false)
-    private Roles role;
+    private Role role;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
