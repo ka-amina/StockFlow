@@ -20,8 +20,9 @@ public class Permissions {
     @Column(name="permission_name", nullable = false)
     private String name;
 
-    @Builder.Default
     @ManyToMany(mappedBy = "permissions")
-    private Set<User> users = new HashSet<>();
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Set<Role> roles = new HashSet<>();
 
 }

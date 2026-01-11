@@ -6,7 +6,7 @@ import lombok.*;
 import java.util.*;
 
 @Entity
-@Table(name= "roles")
+@Table(name = "roles")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -17,10 +17,19 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "role_name", nullable = false,unique = true)
+    @Column(name = "role_name", nullable = false, unique = true)
     private String roleName;
 
     @Builder.Default
     @OneToMany(mappedBy = "role", orphanRemoval = true)
     private List<User> users = new ArrayList<>();
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "roles_permissions_table",
+            joinColumns = @JoinColumn(name = "role_id"),
+            inverseJoinColumns = @JoinColumn(name = "permission_id")
+    )
+
+    private Set<Permissions> permissions = new HashSet<>();
 }

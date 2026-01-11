@@ -28,7 +28,7 @@ public class User {
     private Boolean active = true;
 
     @Builder.Default
-    @OneToMany(mappedBy = "user" , fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user" , fetch = FetchType.LAZY, orphanRemoval = true)
     private List<RefreshToken> refreshTokens = new ArrayList<>();
 
     @ManyToOne
