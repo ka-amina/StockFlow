@@ -35,7 +35,16 @@ public class JwtUtil {
         claims.put("roles", userDetails.getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority)
-                .toList());
+                .filter(auth -> auth.startsWith("ROLE_"))
+                .toList()
+        );
+        
+        claims.put("permissions", userDetails.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .filter(auth -> !auth.startsWith("ROLE_"))
+                .toList()
+        );
 
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
