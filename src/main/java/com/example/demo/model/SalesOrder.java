@@ -67,7 +67,7 @@ public class SalesOrder {
             orderDate = LocalDateTime.now();
         }
         if (orderNumber == null) {
-            orderNumber = "SO-" + System.currentTimeMillis();
+            orderNumber = "SO-" + System.currentTimeMillis() + "-" + (int)(Math.random() * 10000);
         }
     }
 

@@ -28,7 +28,7 @@ public class UserService {
 
 
     @Transactional
-    public AuthResponseDTO createUser(UserDTO dto) {
+    public UserDTO registerUser(UserDTO dto) {
         // Check if email already exists
         if (userRepo.existsByEmail(dto.getEmail())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
@@ -47,7 +47,7 @@ public class UserService {
         user.setPasswordHash(passwordEncoder.encode(dto.getPassword()));
 
         User savedUser = userRepo.save(user);
-        return userMapper.toAuthResponseDTO(savedUser);
+        return userMapper.toDto(savedUser);
     }
 
     @Transactional(readOnly = true)

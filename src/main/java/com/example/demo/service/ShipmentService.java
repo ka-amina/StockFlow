@@ -167,6 +167,43 @@ public class ShipmentService {
         return mapper.toDto(updatedShipment);
     }
 
+    @Transactional
+    public ShipmentDTO updateShipment(Long shipmentId, CreateShipmentDTO dto) {
+        Shipment shipment = shipmentRepo.findById(shipmentId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Shipment not found with ID: " + shipmentId));
+
+        // Update carrier if provided
+        if (dto.getCarrierId() != null) {
+            Carrier carrier = carrierRepo.findById(dto.getCarrierId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                            "Carrier not found with ID: " + dto.getCarrierId()));
+            shipment.setCarrier(carrier);
+        }
+
+        // Update tracking number if provided
+        if (dto.getTrackingNumber() != null && !dto.getTrackingNumber().isBlank()) {
+            if (shipmentRepo.existsByTrackingNumber(dto.getTrackingNumber())) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                        "Tracking number already exists: " + dto.getTrackingNumber());
+            }
+            shipment.setTrackingNumber(dto.getTrackingNumber());
+        }
+
+        // Update planned date if provided
+        if (dto.getPlannedDate() != null) {
+            shipment.setPlannedDate(dto.getPlannedDate());
+        }
+
+        // Update notes if provided
+        if (dto.getNotes() != null) {
+            shipment.setNotes(dto.getNotes());
+        }
+
+        Shipment updatedShipment = shipmentRepo.save(shipment);
+        return mapper.toDto(updatedShipment);
+    }
+
     @Transactional(readOnly = true)
     public ShipmentDTO getShipmentById(Long id) {
         Shipment shipment = shipmentRepo.findById(id)

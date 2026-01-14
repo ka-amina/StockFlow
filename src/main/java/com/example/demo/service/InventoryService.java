@@ -40,6 +40,32 @@ public class InventoryService {
     }
 
     @Transactional
+    public InventoryDTO createInventory(InventoryDTO dto) {
+        Product product = productRepo.findById(dto.getProductId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
+        
+        Warehouse warehouse = warehouseRepo.findById(dto.getWarehouseId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Warehouse not found"));
+        
+        // Check if inventory already exists for this product-warehouse combination
+        inventoryRepo.findByProductAndWarehouse(product, warehouse)
+                .ifPresent(existing -> {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, 
+                            "Inventory already exists for this product in this warehouse");
+                });
+        
+        Inventory inventory = Inventory.builder()
+                .product(product)
+                .warehouse(warehouse)
+                .qtyOnHand(dto.getQtyOnHand() != null ? dto.getQtyOnHand() : 0)
+                .qtyReserved(0)
+                .build();
+        
+        Inventory saved = inventoryRepo.save(inventory);
+        return mapper.toDto(saved);
+    }
+
+    @Transactional
     public InventoryMovementDTO recordInbound(RecordInboundDTO dto) {
         // Validate product exists and is active
         Product product = productRepo.findById(dto.getProductId())

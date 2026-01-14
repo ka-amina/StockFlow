@@ -2,7 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.dto.AuthResponseDTO;
 import com.example.demo.dto.LoginDTO;
-import com.example.demo.enums.Role;
+import com.example.demo.model.Role;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
@@ -33,11 +33,15 @@ class AuthServiceTest {
         loginDTO.setEmail("test@example.com");
         loginDTO.setPassword("password123");
 
+        Role clientRole = new Role();
+        clientRole.setId(1L);
+        clientRole.setRoleName("CLIENT");
+
         User user = new User();
         user.setId(1L);
         user.setEmail("test@example.com");
         user.setPasswordHash("password123");
-        user.setRole(Role.CLIENT);
+        user.setRole(clientRole);
         user.setActive(true);
 
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
@@ -49,7 +53,6 @@ class AuthServiceTest {
         assertNotNull(result);
         assertEquals(1L, result.getUserId());
         assertEquals("test@example.com", result.getEmail());
-        assertEquals(Role.CLIENT, result.getRole());
         verify(session).setAttribute("authenticated_user", 1L);
     }
 

@@ -23,6 +23,13 @@ public class InventoryController {
         this.inventoryService = inventoryService;
     }
 
+    // Create new inventory record
+    @PostMapping
+    public ResponseEntity<ApiResponse<InventoryDTO>> createInventory(@Valid @RequestBody InventoryDTO dto) {
+        InventoryDTO created = inventoryService.createInventory(dto);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success(created, "Inventory created successfully"));
+    }
 
     // SF-11: Record INBOUND stock entry
 

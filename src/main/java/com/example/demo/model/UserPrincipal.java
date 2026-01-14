@@ -20,8 +20,12 @@ public class UserPrincipal implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRole().getRoleName()));
-        user.getRole().getPermissions().forEach(
-                permissions -> authorities.add(new SimpleGrantedAuthority(permissions.getName())));
+        
+        // Check if permissions is not null before iterating
+        if (user.getRole().getPermissions() != null) {
+            user.getRole().getPermissions().forEach(
+                    permissions -> authorities.add(new SimpleGrantedAuthority(permissions.getName())));
+        }
         return authorities;
     }
 
@@ -52,6 +56,10 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return user.getActive() != null && user.getActive();
+    }
+    
+    public User getUser() {
+        return user;
     }
 }

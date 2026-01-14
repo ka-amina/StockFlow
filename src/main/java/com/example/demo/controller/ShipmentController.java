@@ -58,6 +58,14 @@ public class ShipmentController {
         return ResponseEntity.ok(ApiResponse.success(shipment, "Tracking number updated successfully"));
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<ShipmentDTO>> updateShipment(
+            @PathVariable Long id,
+            @Valid @RequestBody CreateShipmentDTO dto) {
+        ShipmentDTO shipment = shipmentService.updateShipment(id, dto);
+        return ResponseEntity.ok(ApiResponse.success(shipment, "Shipment updated successfully"));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ShipmentDTO>> getShipmentById(@PathVariable Long id) {
         ShipmentDTO shipment = shipmentService.getShipmentById(id);

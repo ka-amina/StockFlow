@@ -107,6 +107,7 @@ class ProductServiceTest {
         ProductDTO result = productService.activateProduct(1L);
 
         // Then
+        assertNotNull(result);
         assertTrue(product.isActive());
         verify(productRepository).save(product);
     }
@@ -126,6 +127,7 @@ class ProductServiceTest {
         ProductDTO result = productService.deactivateProduct(1L);
 
         // Then
+        assertNotNull(result);
         assertFalse(product.isActive());
         verify(productRepository).save(product);
     }

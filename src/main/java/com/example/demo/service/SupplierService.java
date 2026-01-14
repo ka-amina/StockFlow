@@ -33,4 +33,15 @@ public class SupplierService {
                 .map(mapper::toDto)
                 .toList();
     }
+
+    @Transactional
+    public SupplierDTO updateSupplier(Long id, SupplierDTO dto) {
+        Supplier existing = repo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Supplier not found with id: " + id));
+        
+        if (dto.getName() != null) existing.setName(dto.getName());
+        
+        Supplier saved = repo.save(existing);
+        return mapper.toDto(saved);
+    }
 }

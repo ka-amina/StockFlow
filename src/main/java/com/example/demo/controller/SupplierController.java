@@ -32,4 +32,11 @@ public class SupplierController {
         ApiResponse<List<SupplierDTO>> body = new ApiResponse<>("Suppliers retrieved successfully", suppliers);
         return ResponseEntity.ok(body);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<SupplierDTO>> updateSupplier(@PathVariable Long id, @Valid @RequestBody SupplierDTO dto) {
+        SupplierDTO updated = service.updateSupplier(id, dto);
+        ApiResponse<SupplierDTO> body = new ApiResponse<>("Supplier updated successfully", updated);
+        return ResponseEntity.ok(body);
+    }
 }

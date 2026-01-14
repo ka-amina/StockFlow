@@ -88,6 +88,13 @@ public class AuthController {
         // Revoke old refresh token (token rotation)
         refreshTokenService.revokeToken(req.getRefreshToken());
         
+        // Small delay to ensure different timestamp (prevent same-second token generation)
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        
         // Generate new tokens
         UserDetails userDetails = userDetailsService.loadUserByUsername(token.getUser().getEmail());
         String newAccessToken = jwtUtil.generateAccessToken(userDetails);

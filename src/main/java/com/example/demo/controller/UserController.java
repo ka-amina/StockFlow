@@ -22,8 +22,8 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<AuthResponseDTO>> createUser(@Valid @RequestBody UserDTO dto) {
-        AuthResponseDTO createdUser = userService.createUser(dto);
+    public ResponseEntity<ApiResponse<UserDTO>> registerUser(@Valid @RequestBody UserDTO dto) {
+        UserDTO createdUser = userService.registerUser(dto);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(ApiResponse.success(createdUser, "User created successfully"));
