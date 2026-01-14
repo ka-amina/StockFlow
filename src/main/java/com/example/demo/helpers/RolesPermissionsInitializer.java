@@ -17,8 +17,18 @@ public class RolesPermissionsInitializer {
     private final PermissionsRepository permissionsRepository;
     @PostConstruct
     public void initRolesPermissions(){
+        // Skip initialization if no roles exist OR if permissions are already assigned
+        if (rolesRepository.count() == 0) {
+            return;
+        }
+        
         // --- Fetch roles ---
         Role adminRole = rolesRepository.findByRoleName("ADMIN");
+        
+        // Skip if permissions are already assigned (e.g., by SQL scripts in tests)
+        if (adminRole != null && !adminRole.getPermissions().isEmpty()) {
+            return;
+        }
         Role warehouseRole = rolesRepository.findByRoleName("WAREHOUSE_MANAGER");
         Role clientRole = rolesRepository.findByRoleName("CLIENT");
         // --- Fetch permissions ---

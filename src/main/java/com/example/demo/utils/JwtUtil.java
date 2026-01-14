@@ -36,6 +36,7 @@ public class JwtUtil {
                 .stream()
                 .map(GrantedAuthority::getAuthority)
                 .filter(auth -> auth.startsWith("ROLE_"))
+                .map(role -> role.substring(5)) // Remove "ROLE_" prefix
                 .toList()
         );
         
@@ -47,6 +48,7 @@ public class JwtUtil {
         );
 
         return Jwts.builder()
+                .setClaims(claims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRATION_TIME))
