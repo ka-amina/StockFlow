@@ -8,7 +8,6 @@ import com.example.demo.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -36,8 +35,8 @@ public class UserController {
     }
 
     @GetMapping("/email/{email}")
-    public ResponseEntity<ApiResponse<UserDetails>> getUserByEmail(@PathVariable String email) {
-        UserDetails user = userService.getUserByEmail(email);
+    public ResponseEntity<ApiResponse<User>> getUserByEmail(@PathVariable String email) {
+        User user = userService.getUserByEmail(email);
         return ResponseEntity.ok(ApiResponse.success(user, "User retrieved successfully"));
     }
 }

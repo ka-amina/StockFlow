@@ -5,12 +5,10 @@ import com.example.demo.dto.UserDTO;
 import com.example.demo.mapper.UsersMapper;
 import com.example.demo.model.Role;
 import com.example.demo.model.User;
-import com.example.demo.model.UserPrincipal;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.repository.UserRoleRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,11 +59,10 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserDetails getUserByEmail(String email) {
-        User user = userRepo.findByEmail(email)
+    public User getUserByEmail(String email) {
+        return userRepo.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "User not found with email: " + email));
-        return new UserPrincipal(user);
     }
 
 //    @Transactional(readOnly = true)
